@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Đăng nhập</title>
+    <style>
+        .login-form {
+            width: 80%;
+            margin: auto;
+            margin-top: 60px;
+        }
+
+        .form-container {
+            width: 40%;
+            margin: auto;
+        }
+
+        .form-group {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: table-cell;
+            width: 30%;
+            text-align: left;
+            padding-right: 10px;
+        }
+
+        .form-input-wrapper {
+            display: table-cell;
+            width: 70%;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #f28e8e;
+            color: #000;
+        }
+
+        .password-input-wrapper {
+            align-items: center;
+            position: relative;
+        }
+
+        .password-input {
+            width: 100%;
+        }
+
+        .icon-eye {
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+        .submit-button {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 30%;
+            float: left;
+        }
+
+        .submit-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/react-icons/umd/react-icons.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+        const { BsEyeFill, BsEyeSlashFill } = ReactIcons;
+
+        function LoginForm() {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [showPassword, setShowPassword] = useState(false);
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [error, setError] = useState('');
+            const usernameRef = useRef(null);
+
+            useEffect(() => {
+                usernameRef.current.focus();
+            }, []);
+
+            const handleLogin = () => {
+                if (!username || !password) {
+                    setError('Phải nhập tên người dùng và mật khẩu');
+                    return;
+                }
+
+                if (username.length < 6 || username.length > 20) {
+                    setError('Tên người dùng phải nhập từ 6-20 ký tự');
+                    return;
+                }
+
+                localStorage.setItem('username', username);
+                setIsLoggedIn(true);
+            };
+
+            const handleShowPassword = () => {
+                setShowPassword(!showPassword);
+            };
+
+            return (
+                <div className="login-form">
+                    {isLoggedIn ? (
+                        <div>
+                            <h2>Xin chào: {username}</h2>
+                        </div>
+                    ) : (
+                        <form className='form-container' onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+                            <div className="form-group">
+                                <label className="form-label">Tên đăng nhập</label>
+                                <div className="form-input-wrapper">
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        ref={usernameRef}
+                                        placeholder='Nhập 6-20 ký tự'
+                                        required
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Mật khẩu</label>
+                                <div className="form-input-wrapper">
+                                    <div className="password-input-wrapper">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder='Mật khẩu'
+                                            required
+                                            className="form-input password-input"
+                                        />
+                                        {showPassword ? (
+                                            <BsEyeSlashFill onClick={handleShowPassword} className="icon-eye" />
+                                        ) : (
+                                            <BsEyeFill onClick={handleShowPassword} className="icon-eye" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            {error && <p className="error-message">{error}</p>}
+                            <button type="submit" disabled={!username || !password} className="submit-button">Đăng nhập</button>
+                        </form>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<LoginForm />, document.getElementById('root'));
+    </script>
+</body>
+</html>
